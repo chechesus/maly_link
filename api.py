@@ -20,6 +20,22 @@ def response_index(response:str):
         response += reader.read() 
     return response
 
+def shorten_url(request, response):
+    try:
+        # body = request.split("\n\n")[1]
+        # data = json.loads(body)
+        # print(data)
+        print(request)
+        response_data = {"shortUrl":""}
+        response_data_str = json.dumps(response_data)
+        response += "Content-Type: application/json; charset=UTF-8\n"
+        response += "Content-Length: "+str(len(response_data_str))+"\n\n"
+        response += response_data_str
+    except Exception as e:
+        print("ERROR:", e)
+        print(request)
+        pass
+
 while True:    
     # Wait for client connections
     client_connection, client_address = server_socket.accept()
@@ -38,29 +54,14 @@ while True:
     response = 'HTTP/1.1 200 OK\n' 
 
     
-
+    # function routing
     if req == "GET" and (path == "/"  or path == "/index.html"):
         response = response_index(response)
     elif req == "POST":
-        try:
-            # body = request.split("\n\n")[1]
-            # data = json.loads(body)
-            # print(data)
-            print(request)
-            response_data = {"shortUrl":""}
-            response_data_str = json.dumps(response_data)
-            response += "Content-Type: application/json; charset=UTF-8\n"
-            response += "Content-Length: "+str(len(response_data_str))+"\n\n"
-            response += response_data_str
-        except Exception as e:
-            print("ERROR:", e)
-            print(request)
-            pass
-        
-    # Send HTTP response
-    
-    print("RESPONSE:", response)
+        response = shorten_url(request, response)
 
+    # Send HTTP response
+    print("RESPONSE:", response)
     client_connection.sendall(response.encode())
     client_connection.close()
 
