@@ -62,6 +62,7 @@ while True:
         lines = request.split("\n")
         req, path, http_ver = lines[0].split(" ")
         print("req:", req, "path:", path, "ver:", http_ver)
+        print("CESTA:", path)
     except:
         break
     response = 'HTTP/1.1 200 OK\n' 
@@ -73,6 +74,17 @@ while True:
         print("reading body")
         request += client_connection.recv(4096).decode()
         response = shorten_url(request, response)
+    else:
+        # Handle other request methods
+        parsed_url = urlparse(path)
+
+        # Parse the slash
+        short_url = parsed_url.path[1:]
+
+        if short_url in url_map:
+             long_url = url_map[short_url]
+             response = 'HTTP/1.1 307 Temporary Redirect\n'# Temporarely redirected message
+             response += f"Location: {long_url}\n\n" #Redirects to original URL
 
     # Send HTTP response
     print("RESPONSE:", response)
