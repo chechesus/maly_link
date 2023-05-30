@@ -1,6 +1,7 @@
 import socket
 import json
-
+import hashlib
+from urllib.parse import urlparse
 
 # Define socket host and port
 SERVER_HOST = '0.0.0.0'
@@ -17,55 +18,66 @@ def response_index(response:str):
     # request na stranku pre html
     with open("index.html") as reader:
         response += "Content-Type: text/html; charset=UTF-8`\n\n"
-        response += reader.read() 
+        response += reader.read()
     return response
+
+url_map = {}
 
 def shorten_url(request, response):
     try:
-        # body = request.split("\n\n")[1]
-        # data = json.loads(body)
-        # print(data)
-        print(request)
-        response_data = {"shortUrl":""}
+        print("Request:", request)
+        body = request.split("\n\n")
+        if len(body) < 2:
+            body = request.split("\r\n\r\n")
+        print("Body:", body)
+        data = json.loads(str(body[1]))
+        print("Data:", data)
+        long_url = data["longUrl"]
+
+        # Hash generation 
+        h = hashlib.new('sha256')
+        h.update(long_url.encode()) # String to hash 
+        short_url = h.hexdigest()[:8]
+
+        # Original URL into map 
+        url_map[short_url] = long_url
+
+        response_data = {"shortUrl": "http://localhost/" + short_url}
         response_data_str = json.dumps(response_data)
         response += "Content-Type: application/json; charset=UTF-8\n"
-        response += "Content-Length: "+str(len(response_data_str))+"\n\n"
+        response += "Content-Length: " + str(len(response_data_str)) + "\n\n"
         response += response_data_str
     except Exception as e:
         print("ERROR:", e)
-        print(request)
-        pass
+        raise
+        
+    return response
 
 while True:    
-    # Wait for client connections
     client_connection, client_address = server_socket.accept()
-    # print(client_address)
-    # Get the client request
     request = client_connection.recv(4096).decode()
-    # print(request)
+    print(request)
 
     try:
         lines = request.split("\n")
-        # print(request)
         req, path, http_ver = lines[0].split(" ")
         print("req:", req, "path:", path, "ver:", http_ver)
     except:
         break
     response = 'HTTP/1.1 200 OK\n' 
 
-    
-    # function routing
+    # Function routing
     if req == "GET" and (path == "/"  or path == "/index.html"):
         response = response_index(response)
     elif req == "POST":
+        print("reading body")
+        request += client_connection.recv(4096).decode()
         response = shorten_url(request, response)
 
     # Send HTTP response
     print("RESPONSE:", response)
     client_connection.sendall(response.encode())
     client_connection.close()
-
-
 
 # Close socket
 server_socket.close()
