@@ -1,18 +1,45 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <title>SKRACOVAC URL</title>
+  <title>Tiny/link</title>
+  <style>
+    body {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+    }
+
+    .container {
+        text-align: center;
+    }
+
+    .form-group {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-bottom: 10px;
+    }
+
+    .form-group input[type="text"] {
+        margin-right: 10px;
+    }
+
+    .output {
+        margin-top: 5px;
+    }
+</style>
 </head>
 <body>
-    <h1>mini_LINK</h1>
-    <form>
-        <label for="long-url">Long URL:</label><br>
-        <input type="text" id="long-url" name="long-url" placeholder="Enter the long URL"><br><br>
-        <input type="button" value="Shorten" onclick="shortenUrl()">
-    </form>
+  <div class="container">
+      <div class="form-group">
+          <label for="long-url">Long URL: </label><br>
+          <input type="text" id="long-url" name="long-url" placeholder="Paste http://...">
+          <input type="button" value="Shorten" onclick="shortenUrl()">
+      </div>
 
-    <p id="short-url"></p>
-
+      <div class="output" id="short-url"></div>
+    </div>
     <script>
       function shortenUrl() {
         var longUrl = document.getElementById("long-url").value;
