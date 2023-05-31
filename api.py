@@ -72,7 +72,8 @@ while True:
         response = response_index(response)
     elif req == "POST":
         print("reading body")
-        request += client_connection.recv(4096).decode()
+        if "longUrl" not in request:
+            request += client_connection.recv(4096).decode()
         response = shorten_url(request, response)
     else:
         # Handle other request methods

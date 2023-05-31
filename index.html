@@ -4,7 +4,7 @@
   <title>Tiny/link</title>
   <style>
     img {
-      width: 100%;
+      width: 200%;
     }
     body {
       display: flex;
@@ -13,10 +13,12 @@
       height: 100vh;
       margin: 0;
       background-color: tomato;
+      font: caption;
     }
 
     .container {
       text-align: center;
+      font: caption;
     }
 
     .form-group {
@@ -24,6 +26,7 @@
       justify-content: center;
       align-items: center;
       margin-bottom: 10px;
+      font: caption;
     }
 
     .form-group input[type="text"] {
@@ -42,7 +45,7 @@
       color: white;
       border-radius: 4px;
       text-align: center;
-      font-size: 14px;
+      font: caption;
     }
   </style>
 </head>
@@ -51,7 +54,7 @@
   <div class="container">
     <div class="form-group">
       <label for="long-url">Nadzigaj URL:</label><br>
-      <input type="text" id="long-url" name="long-url" placeholder="http://...">
+      <input type="text" id="long-url" name="long-url" placeholder="http://..."><br>
       <input type="button" value="Shorten" onclick="shortenUrl()">
     </div>
     <div class="output" id="short-url"></div>
