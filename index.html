@@ -1,68 +1,96 @@
 <!DOCTYPE html>
 <html>
+<head>
   <title>Tiny/link</title>
   <style>
+    img {
+      width: 100%;
+    }
     body {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 100vh;
-        margin: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      background-color: tomato;
     }
 
     .container {
-        text-align: center;
+      text-align: center;
     }
 
     .form-group {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        margin-bottom: 10px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-bottom: 10px;
     }
 
     .form-group input[type="text"] {
-        margin-right: 10px;
+      margin-right: 10px;
     }
 
     .output {
-        margin-top: 5px;
+      margin-top: 5px;
     }
-</style>
+
+    .copy-text {
+      margin-top: 10px;
+      display: inline-block;
+      /*padding: 5px 10px;*/
+      background-color: #0c5fa7;
+      color: white;
+      border-radius: 4px;
+      text-align: center;
+      font-size: 14px;
+    }
+  </style>
 </head>
+
 <body>
   <div class="container">
-      <div class="form-group">
-          <label for="long-url">Long URL:</label><br>
-          <input type="text" id="long-url" name="long-url" placeholder="Paste http://...">
-          <input type="button" value="Shorten" onclick="shortenUrl()">
-      </div>
-
-      <div class="output" id="short-url"></div>
+    <div class="form-group">
+      <label for="long-url">Nadzigaj URL:</label><br>
+      <input type="text" id="long-url" name="long-url" placeholder="http://...">
+      <input type="button" value="Shorten" onclick="shortenUrl()">
     </div>
-    <script>
-      function shortenUrl() {
-        var longUrl = document.getElementById("long-url").value;
-        var apiUrl = "http://localhost"; // API endpoint
-  
-        // API REQ
-        fetch(apiUrl, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ longUrl: longUrl }),
-        })
+    <div class="output" id="short-url"></div>
+    <button class="copy-text" id="copy-text" onclick="COPY()">COPY</button>
+  </div>
+
+  <script>
+    function shortenUrl() {
+      var longUrl = document.getElementById("long-url").value;
+      var apiUrl = "http://localhost"; // API endpoint
+
+      // API REQ
+      fetch(apiUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ longUrl: longUrl }),
+      })
         .then(response => response.json())
         .then(data => {
           // Display the shortened URL to the user
           var shortUrl = data.shortUrl;
           document.getElementById("short-url").textContent = "Shortened URL: " + shortUrl;
+          document.getElementById("copy-text").style.display = "inline-block"; // Copy button
+          document.getElementById("copy-text").setAttribute("data-clipboard-text", shortUrl); // ShortURL to clibard as text
         })
         .catch(error => {
           console.error("Error:", error);
         });
-      }
-      </script>
+    }
+
+    function COPY() {
+    var copyText = document.getElementById("copy-text").getAttribute("data-clipboard-text");
+    navigator.clipboard.writeText(copyText)
+    .catch(error => {
+      console.error("Error copying to clipboard:", error);
+    });
+}
+  </script>
 </body>
 </html>
