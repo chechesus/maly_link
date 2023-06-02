@@ -2,10 +2,14 @@ import socket
 import json
 import hashlib
 from urllib.parse import urlparse
+import redis
 
 # Define socket host and port
 SERVER_HOST = '0.0.0.0'
 SERVER_PORT = 80
+#socket for redis 
+REDIS_HOST = '127.0.0.1'
+REDIS_PORT = 6379
 
 # Create socket
 server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -14,14 +18,14 @@ server_socket.bind((SERVER_HOST, SERVER_PORT))
 server_socket.listen(1)
 print('Listening on port %s ...' % SERVER_PORT)
 
+redis_client = redis.Redis(host=REDIS_HOST, port=REDIS_PORT)
+
 def response_index(response:str):
     # request na stranku pre html
     with open("index.html") as reader:
         response += "Content-Type: text/html; charset=UTF-8`\n\n"
         response += reader.read()
     return response
-
-url_map = {}
 
 def shorten_url(request, response):
     try:
@@ -34,13 +38,17 @@ def shorten_url(request, response):
         print("Data:", data)
         long_url = data["longUrl"]
 
-        # Hash generation 
-        h = hashlib.new('sha256')
-        h.update(long_url.encode()) # String to hash 
-        short_url = h.hexdigest()[:8]
+        # Check if the long URL exists in the Redis database
+        if redis_client.exists(long_url):
+            short_url = redis_client.get(long_url).decode()
+        else:
+            # Hash generation
+            h = hashlib.new('sha256')
+            h.update(long_url.encode()) # String to hash 
+            short_url = h.hexdigest()[:8]
 
-        # Original URL into map 
-        url_map[short_url] = long_url
+            # Store the short URL in the Redis database
+            redis_client.set(long_url, short_url)
 
         response_data = {"shortUrl": "http://localhost/" + short_url}
         response_data_str = json.dumps(response_data)
@@ -52,6 +60,8 @@ def shorten_url(request, response):
         raise
         
     return response
+
+url_map = {}
 
 while True:    
     client_connection, client_address = server_socket.accept()
@@ -84,13 +94,4 @@ while True:
 
         if short_url in url_map:
              long_url = url_map[short_url]
-             response = 'HTTP/1.1 307 Temporary Redirect\n'# Temporarely redirected message
-             response += f"Location: {long_url}\n\n" #Redirects to original URL
-
-    # Send HTTP response
-    print("RESPONSE:", response)
-    client_connection.sendall(response.encode())
-    client_connection.close()
-
-# Close socket
-server_socket.close()
+             response = 'HTTP/1.1 307 Temporary Redirect\n'  #
