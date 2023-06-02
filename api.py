@@ -2,15 +2,15 @@ import socket
 import json
 import hashlib
 from urllib.parse import urlparse
-#import redis
+import redis
 
 # Define socket host and port
 SERVER_HOST = '0.0.0.0'
 SERVER_PORT = 80
 
-#socket for redis 
-#REDIS_HOST = '127.0.0.1'
-#REDIS_PORT = 6379
+# redis client 
+REDIS_HOST = '127.0.0.1'
+REDIS_PORT = 6379
 
 # Create socket
 server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -20,7 +20,7 @@ server_socket.listen(1)
 print('Listening on port %s ...' % SERVER_PORT)
 
 
-#redis_client = redis.Redis(host=REDIS_HOST, port=REDIS_PORT)
+redis_client = redis.Redis(host=REDIS_HOST, port=REDIS_PORT)
 
 def response_index(response:str):
     # request na stranku pre html
@@ -49,6 +49,7 @@ def shorten_url(request, response):
 
         # Original URL into map 
         url_map[short_url] = long_url
+        redis_client.mset({short_url:long_url})
 
         response_data = {"shortUrl": "http://localhost/" + short_url}
         response_data_str = json.dumps(response_data)
@@ -90,10 +91,13 @@ while True:
         # Parse the slash
         short_url = parsed_url.path[1:]
 
-        if short_url in url_map:
+        long_url = redis_client.get(short_url)
+        if long_url :
              long_url = url_map[short_url]
              response = 'HTTP/1.1 307 Temporary Redirect\n'# Temporarely redirected message
-             response += f"Location: {long_url}\n\n" #Redirects to original URL
+             response += f"Location: {str(long_url)}\n\n" #Redirects to original URL
+        else:
+            response = 'HTTP/1.1 404 Not Found\n\n'
 
     # Send HTTP response
     print("RESPONSE:", response)
