@@ -63,13 +63,12 @@
         <input type="button" value="Shorten" onclick="shortenUrl()" />
       </div>
       <div class="output" id="short-url"></div>
-      <button class="copy-text" id="copy-text" onclick="COPY()">COPY</button>
-    </div>
+      <button class="copy-text" id="copy-text" onclick="COPY()">COPY</butto>    </div>
 
     <script>
-      function shortenUrl() {
+       function shortenUrl() {
         var longUrl = document.getElementById("long-url").value;
-        var apiUrl = "https://localhost"; // Updated API endpoint (HTTPS)
+        var apiUrl = "${api_url}"; // API endpoint
 
         // API REQ
         fetch(apiUrl, {
@@ -85,11 +84,9 @@
             var shortUrl = data.shortUrl;
             document.getElementById("short-url").textContent =
               "Shortened URL: " + shortUrl;
-            document.getElementById("copy-text").style.display = "inline-block"; // Copy button
-            document
+            document.getElementById("copy-text").style.display = "inline-bl>            document
               .getElementById("copy-text")
-              .setAttribute("data-clipboard-text", shortUrl); // ShortURL to clibard as text
-          })
+              .setAttribute("data-clipboard-text", shortUrl); // ShortURL t>          })
           .catch((error) => {
             console.error("Error:", error);
           });
