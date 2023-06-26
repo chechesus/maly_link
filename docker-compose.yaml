@@ -1,0 +1,30 @@
+version: "3.8"
+services:
+  redis:
+    image: redis
+    restart: always
+    ports:
+      - "6379:6379"
+    command: redis-server --save 20 1 --loglevel warning --requirepass totomozebytheslo
+    volumes:
+      - redis:/data
+  api:
+    container_name: short_url
+    build:
+      context: ./
+    image: short_url
+    restart: always
+    depends_on:
+      - redis
+    ports:
+      - 8000:80
+    environment:
+      API_URL: http://janf.pale.sk:8000
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: totomozebytheslo
+    links:
+      - redis
+volumes:
+  redis:
+    driver: local
