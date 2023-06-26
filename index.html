@@ -1,99 +1,108 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <title>Tiny/link</title>
-  <style>
-    img {
-      width: 200%;
-    }
-    body {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      margin: 0;
-      background-color: tomato;
-      font: caption;
-    }
+  <head>
+    <title>Tiny/link</title>
+    <style>
+      img {
+        width: 200%;
+      }
+      body {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+        background-color: tomato;
+        font: caption;
+      }
 
-    .container {
-      text-align: center;
-      font: caption;
-    }
+      .container {
+        text-align: center;
+        font: caption;
+      }
 
-    .form-group {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      margin-bottom: 10px;
-      font: caption;
-    }
+      .form-group {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-bottom: 10px;
+        font: caption;
+      }
 
-    .form-group input[type="text"] {
-      margin-right: 10px;
-    }
+      .form-group input[type="text"] {
+        margin-right: 10px;
+      }
 
-    .output {
-      margin-top: 5px;
-    }
+      .output {
+        margin-top: 5px;
+      }
 
-    .copy-text {
-      margin-top: 10px;
-      display: inline-block;
-      /*padding: 5px 10px;*/
-      background-color: #0c5fa7;
-      color: white;
-      border-radius: 4px;
-      text-align: center;
-      font: caption;
-    }
-  </style>
-</head>
+      .copy-text {
+        margin-top: 10px;
+        display: inline-block;
+        /*padding: 5px 10px;*/
+        background-color: #0c5fa7;
+        color: white;
+        border-radius: 4px;
+        text-align: center;
+        font: caption;
+      }
+    </style>
+  </head>
 
-<body>
-  <div class="container">
-    <div class="form-group">
-      <label for="long-url">Nadzigaj URL:</label><br>
-      <input type="text" id="long-url" name="long-url" placeholder="http://..."><br>
-      <input type="button" value="Shorten" onclick="shortenUrl()">
+  <body>
+    <div class="container">
+      <div class="form-group">
+        <label for="long-url">Nadzigaj URL:</label><br />
+        <input
+          type="text"
+          id="long-url"
+          name="long-url"
+          placeholder="http://..."
+        /><br />
+        <input type="button" value="Shorten" onclick="shortenUrl()" />
+      </div>
+      <div class="output" id="short-url"></div>
+      <button class="copy-text" id="copy-text" onclick="COPY()">COPY</button>
     </div>
-    <div class="output" id="short-url"></div>
-    <button class="copy-text" id="copy-text" onclick="COPY()">COPY</button>
-  </div>
 
-  <script>
-    function shortenUrl() {
-      var longUrl = document.getElementById("long-url").value;
-      var apiUrl = "http://localhost"; // API endpoint
+    <script>
+      function shortenUrl() {
+        var longUrl = document.getElementById("long-url").value;
+        var apiUrl = "https://localhost"; // Updated API endpoint (HTTPS)
 
-      // API REQ
-      fetch(apiUrl, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ longUrl: longUrl }),
-      })
-        .then(response => response.json())
-        .then(data => {
-          // Display the shortened URL to the user
-          var shortUrl = data.shortUrl;
-          document.getElementById("short-url").textContent = "Shortened URL: " + shortUrl;
-          document.getElementById("copy-text").style.display = "inline-block"; // Copy button
-          document.getElementById("copy-text").setAttribute("data-clipboard-text", shortUrl); // ShortURL to clibard as text
+        // API REQ
+        fetch(apiUrl, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ longUrl: longUrl }),
         })
-        .catch(error => {
-          console.error("Error:", error);
-        });
-    }
+          .then((response) => response.json())
+          .then((data) => {
+            // Display the shortened URL to the user
+            var shortUrl = data.shortUrl;
+            document.getElementById("short-url").textContent =
+              "Shortened URL: " + shortUrl;
+            document.getElementById("copy-text").style.display = "inline-block"; // Copy button
+            document
+              .getElementById("copy-text")
+              .setAttribute("data-clipboard-text", shortUrl); // ShortURL to clibard as text
+          })
+          .catch((error) => {
+            console.error("Error:", error);
+          });
+      }
 
-    function COPY() {
-    var copyText = document.getElementById("copy-text").getAttribute("data-clipboard-text");
-    navigator.clipboard.writeText(copyText)
-    .catch(error => {
-      console.error("Error copying to clipboard:", error);
-    });
-}
-  </script>
-</body>
+      function COPY() {
+        var copyText = document
+          .getElementById("copy-text")
+          .getAttribute("data-clipboard-text");
+        navigator.clipboard.writeText(copyText).catch((error) => {
+          console.error("Error copying to clipboard:", error);
+        });
+      }
+    </script>
+  </body>
 </html>
